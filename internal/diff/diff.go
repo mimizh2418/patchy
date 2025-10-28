@@ -1,8 +1,8 @@
 package diff
 
 import (
-	"fmt"
 	"os"
+	"patchy/internal"
 	"patchy/internal/parser"
 	"text/tabwriter"
 
@@ -81,11 +81,11 @@ func PrintDiff(ops []Operation) {
 	for _, op := range ops {
 		switch op.Type {
 		case Equal:
-			_, _ = fmt.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
+			_, _ = internal.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
 		case Insert:
-			_, _ = fmt.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
+			_, _ = internal.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
 		case Delete:
-			_, _ = fmt.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
+			_, _ = internal.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
 		}
 	}
 
