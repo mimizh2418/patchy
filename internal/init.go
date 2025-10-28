@@ -22,6 +22,12 @@ func Init(path string) (repoPath string, err error) {
         return
     }
 
+    defer func() {
+        if err != nil {
+            _ = os.RemoveAll(repoPath)
+        }
+    }()
+
     if err = os.MkdirAll(filepath.Join(repoPath, "objects"), os.ModePerm); err != nil {
         return
     }
