@@ -3,7 +3,7 @@ package diff
 import (
 	"fmt"
 	"os"
-	"patchy/parser"
+	"patchy/internal/parser"
 	"text/tabwriter"
 
 	"github.com/fatih/color"
