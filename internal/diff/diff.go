@@ -2,8 +2,7 @@ package diff
 
 import (
 	"os"
-	"patchy/internal"
-	"patchy/internal/parser"
+	"patchy/internal/util"
 	"text/tabwriter"
 
 	"github.com/fatih/color"
@@ -56,11 +55,11 @@ func eqlOp(oldLine, newLine int, text string) Operation {
 }
 
 func Diff(file1, file2 string) ([]Operation, error) {
-	a, err := parser.ReadFile(file1)
+	a, err := util.ReadFile(file1)
 	if err != nil {
 		return nil, err
 	}
-	b, err := parser.ReadFile(file2)
+	b, err := util.ReadFile(file2)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +80,11 @@ func PrintDiff(ops []Operation) {
 	for _, op := range ops {
 		switch op.Type {
 		case Equal:
-			_, _ = internal.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
+			_, _ = util.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
 		case Insert:
-			_, _ = internal.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
+			_, _ = util.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
 		case Delete:
-			_, _ = internal.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
+			_, _ = util.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
 		}
 	}
 

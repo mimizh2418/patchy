@@ -26,5 +26,6 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.SilenceUsage = true
 	rootCmd.PersistentFlags().BoolVarP(&flags.Quiet, "quiet", "q", false, "suppress output")
 }

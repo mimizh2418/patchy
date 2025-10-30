@@ -3,22 +3,20 @@ package internal
 import (
 	"errors"
 	"os"
+	"patchy/internal/util"
 	"path/filepath"
 )
 
 func Init(path string) (repoPath string, err error) {
+	if _, e := util.FindRepoDir(); e == nil {
+		err = errors.New("already inside a repository")
+		return
+	}
+
 	repoPath = ""
 
 	repoPath, err = filepath.Abs(filepath.Join(path, ".patchy"))
 	if err != nil {
-		return
-	}
-
-	if _, e := os.Stat(repoPath); e == nil {
-		err = errors.New("repository already initialized")
-		return
-	} else if !errors.Is(e, os.ErrNotExist) {
-		err = e
 		return
 	}
 
@@ -38,7 +36,7 @@ func Init(path string) (repoPath string, err error) {
 		return
 	}
 
-	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main\n"), os.ModePerm); err != nil {
+	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main\n"), 0666); err != nil {
 		return
 	}
 

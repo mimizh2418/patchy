@@ -1,9 +1,20 @@
-package parser
+package util
 
 import (
 	"bufio"
+	"errors"
 	"os"
 )
+
+func DoesFileExist(file string) (bool, error) {
+	if _, err := os.Stat(file); err == nil {
+		return true, nil
+	} else if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	} else {
+		return false, err
+	}
+}
 
 func ReadFile(filename string) ([]string, error) {
 	f, err := os.Open(filename)
