@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"os"
+	"path/filepath"
 )
 
 func DoesFileExist(file string) (bool, error) {
@@ -16,14 +17,38 @@ func DoesFileExist(file string) (bool, error) {
 	}
 }
 
+func IsFileInRepo(path string) (bool, error) {
+	repoRoot, err := FindRepoRoot()
+	if err != nil {
+		return false, err
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return false, err
+	}
+	if _, err := filepath.Rel(repoRoot, absPath); err != nil {
+		return false, nil
+	}
+	return true, nil
+}
+
+func IsDirectory(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	} else {
+		return info.IsDir(), nil
+	}
+}
+
 func ReadFile(filename string) ([]string, error) {
 	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
 	defer func() {
 		_ = f.Close()
 	}()
+	if err != nil {
+		return nil, err
+	}
 
 	scanner := bufio.NewScanner(f)
 	lines := make([]string, 0)

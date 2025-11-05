@@ -39,5 +39,8 @@ func Fprintln(writer io.Writer, a ...any) (n int, err error) {
 }
 
 func Fprintf(writer io.Writer, format string, a ...any) (n int, err error) {
+	if flags.Quiet {
+		return 0, nil
+	}
 	return fmt.Fprintf(writer, format, a...)
 }

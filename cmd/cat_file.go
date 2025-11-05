@@ -14,17 +14,17 @@ var catFileCmd = &cobra.Command{
 	Long:  `Outputs the contents or details of an object given its hash`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		objType, data, err := objects.ReadObject(args[0])
+		objType, err := objects.ReadObjectType(args[0])
 		if err != nil {
 			return err
 		}
 		switch objType {
 		case objects.Blob:
-			util.Println(string(data))
+			return objects.PrintBlob(args[0])
 		case objects.Tree:
-			util.Println(string(data)) // TODO write correct format for this
+			return objects.PrintTree(args[0])
 		case objects.Commit:
-			util.Println(string(data)) // TODO write correct format for this
+			util.Println() // TODO write correct format for this
 		default:
 			return errors.New("unknown object type")
 		}

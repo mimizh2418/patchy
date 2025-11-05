@@ -33,3 +33,11 @@ func FindRepoDir() (string, error) {
 	}
 	return "", errors.New("current directory is not part of a repository")
 }
+
+func FindRepoRoot() (string, error) {
+	repoDir, err := FindRepoDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Dir(repoDir), nil
+}
