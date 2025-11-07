@@ -8,16 +8,11 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "patchy",
-	Short: "bad version control system",
-	Long:  `patchy is a bad version control system`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Use:   "patchy <command> [<args>]",
+	Short: "Bad version control system",
+	Long:  `Patchy is a bad version control system`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {

@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"patchy/internal/objects"
-	"patchy/internal/util"
+	"patchy/internal/objects/objecttype"
 
 	"github.com/spf13/cobra"
 )
@@ -19,16 +19,15 @@ var catFileCmd = &cobra.Command{
 			return err
 		}
 		switch objType {
-		case objects.Blob:
+		case objecttype.Blob:
 			return objects.PrintBlob(args[0])
-		case objects.Tree:
+		case objecttype.Tree:
 			return objects.PrintTree(args[0])
-		case objects.Commit:
-			util.Println() // TODO write correct format for this
+		case objecttype.Commit:
+			return objects.PrintCommit(args[0])
 		default:
 			return errors.New("unknown object type")
 		}
-		return nil
 	},
 }
 

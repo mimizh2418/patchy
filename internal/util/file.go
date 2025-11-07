@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"os"
-	"path/filepath"
 )
 
 func DoesFileExist(file string) (bool, error) {
@@ -15,21 +14,6 @@ func DoesFileExist(file string) (bool, error) {
 	} else {
 		return false, err
 	}
-}
-
-func IsFileInRepo(path string) (bool, error) {
-	repoRoot, err := FindRepoRoot()
-	if err != nil {
-		return false, err
-	}
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return false, err
-	}
-	if _, err := filepath.Rel(repoRoot, absPath); err != nil {
-		return false, nil
-	}
-	return true, nil
 }
 
 func IsDirectory(path string) (bool, error) {

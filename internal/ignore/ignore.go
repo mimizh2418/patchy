@@ -1,8 +1,10 @@
-package util
+package ignore
 
 import (
 	"bufio"
 	"os"
+	"patchy/internal/repo"
+	"patchy/internal/util"
 	"path/filepath"
 	"strings"
 )
@@ -14,13 +16,13 @@ func ReadIgnoreFile() ([]string, error) {
 		return ignorePatterns, nil
 	}
 
-	repoRoot, err := FindRepoRoot()
+	repoRoot, err := repo.FindRepoRoot()
 	if err != nil {
 		return nil, err
 	}
 
 	patterns := []string{".patchy/", ".git/"}
-	ignoreFileExists, err := DoesFileExist(filepath.Join(repoRoot, ".patchyignore"))
+	ignoreFileExists, err := util.DoesFileExist(filepath.Join(repoRoot, ".patchyignore"))
 	if err != nil {
 		return nil, err
 	}

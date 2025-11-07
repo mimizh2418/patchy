@@ -1,8 +1,9 @@
-package util
+package repo
 
 import (
 	"errors"
 	"os"
+	"patchy/internal/util"
 	"path/filepath"
 )
 
@@ -19,7 +20,7 @@ func FindRepoDir() (string, error) {
 		return "", err
 	}
 	for dir != filepath.Dir(dir) {
-		hasRepoDir, err := DoesFileExist(filepath.Join(dir, ".patchy"))
+		hasRepoDir, err := util.DoesFileExist(filepath.Join(dir, ".patchy"))
 		if err != nil {
 			return "", err
 		}
@@ -40,4 +41,19 @@ func FindRepoRoot() (string, error) {
 		return "", err
 	}
 	return filepath.Dir(repoDir), nil
+}
+
+func IsFileInRepo(path string) (bool, error) {
+	repoRoot, err := FindRepoRoot()
+	if err != nil {
+		return false, err
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return false, err
+	}
+	if _, err := filepath.Rel(repoRoot, absPath); err != nil {
+		return false, nil
+	}
+	return true, nil
 }

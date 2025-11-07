@@ -3,6 +3,7 @@ package objects
 import (
 	"fmt"
 	"os"
+	"patchy/internal/objects/objecttype"
 	"patchy/internal/util"
 )
 
@@ -20,7 +21,7 @@ func ReadBlob(hash string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if objType != Blob {
+	if objType != objecttype.Blob {
 		return nil, fmt.Errorf("object %s is not a blob", hash)
 	}
 	return blob, nil

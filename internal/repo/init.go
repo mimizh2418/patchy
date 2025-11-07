@@ -1,14 +1,13 @@
-package internal
+package repo
 
 import (
 	"errors"
 	"os"
-	"patchy/internal/util"
 	"path/filepath"
 )
 
 func Init(path string) (repoPath string, err error) {
-	if _, e := util.FindRepoDir(); e == nil {
+	if _, e := FindRepoDir(); e == nil {
 		err = errors.New("already inside a repository")
 		return
 	}

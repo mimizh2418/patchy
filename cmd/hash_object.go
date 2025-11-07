@@ -8,7 +8,7 @@ import (
 )
 
 var hashObjectCmd = &cobra.Command{
-	Use:   "hash-object <file>",
+	Use:   "hash-object <file> [--write]",
 	Short: "Compute an object hash and optionally create and write an object",
 	Long:  `Compute an object hash from a file and optionally compress and write the file into the object database`,
 	Args:  cobra.ExactArgs(1),
@@ -30,5 +30,5 @@ var write bool
 func init() {
 	rootCmd.AddCommand(hashObjectCmd)
 
-	hashObjectCmd.Flags().BoolVarP(&write, "write", "w", false, "Write object into the object database")
+	hashObjectCmd.Flags().BoolVarP(&write, "write", "w", false, "write object into the object database")
 }
