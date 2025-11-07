@@ -3,8 +3,8 @@ package ignore
 import (
 	"bufio"
 	"os"
-	"patchy/internal/repo"
-	"patchy/internal/util"
+	"patchy/repo"
+	"patchy/util"
 	"path/filepath"
 	"strings"
 )

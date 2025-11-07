@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"patchy/internal/objects"
-	"patchy/internal/util"
+	"patchy/objects"
+	"patchy/util"
 
 	"github.com/spf13/cobra"
 )

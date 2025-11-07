@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"os"
-	"patchy/internal/flags"
+	"patchy/util"
 
 	"github.com/spf13/cobra"
 )
@@ -22,5 +22,5 @@ func Execute() {
 
 func init() {
 	rootCmd.SilenceUsage = true
-	rootCmd.PersistentFlags().BoolVarP(&flags.Quiet, "quiet", "q", false, "suppress output")
+	rootCmd.PersistentFlags().BoolVarP(&util.Quiet, "quiet", "q", false, "suppress output")
 }

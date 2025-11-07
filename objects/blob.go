@@ -3,8 +3,8 @@ package objects
 import (
 	"fmt"
 	"os"
-	"patchy/internal/objects/objecttype"
-	"patchy/internal/util"
+	"patchy/objects/objecttype"
+	"patchy/util"
 )
 
 func makeBlob(filename string) ([]byte, error) {

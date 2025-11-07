@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os/user"
-	"patchy/internal/objects/objecttype"
-	"patchy/internal/util"
+	"patchy/objects/objecttype"
+	"patchy/util"
 	"strconv"
 	"time"
 )

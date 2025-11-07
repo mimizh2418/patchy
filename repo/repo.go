@@ -3,7 +3,7 @@ package repo
 import (
 	"errors"
 	"os"
-	"patchy/internal/util"
+	"patchy/util"
 	"path/filepath"
 )
 
