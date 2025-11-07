@@ -29,6 +29,5 @@ var write bool
 
 func init() {
 	rootCmd.AddCommand(hashObjectCmd)
-
 	hashObjectCmd.Flags().BoolVarP(&write, "write", "w", false, "write object into the object database")
 }

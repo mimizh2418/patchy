@@ -149,11 +149,11 @@ func PrintCommit(hash string) error {
 	if err != nil {
 		return err
 	}
+	util.Printf("commit %s\n", hash)
 	util.Printf("tree %s\n", commit.Tree)
 	if commit.Parent != nil {
 		util.Printf("parent %s\n", *commit.Parent)
 	}
-	util.Printf("commit %s\n", hash)
 	util.Printf("author %s\n", commit.Author)
 	util.Printf("date  %s\n\n", commit.Time.Format(time.RubyDate))
 	if commit.Message != "" {
