@@ -8,7 +8,7 @@ import (
 	"patchy/ignore"
 	"patchy/objects/objecttype"
 	"patchy/repo"
-	util2 "patchy/util"
+	"patchy/util"
 	"path/filepath"
 	"text/tabwriter"
 )
@@ -27,7 +27,7 @@ func WriteTree(path string) (string, error) {
 	repoRoot := filepath.Dir(repoDir)
 
 	// Validate path
-	if exists, err := util2.DoesFileExist(path); err != nil {
+	if exists, err := util.DoesFileExist(path); err != nil {
 		return "", err
 	} else if !exists {
 		return "", nil
@@ -37,7 +37,7 @@ func WriteTree(path string) (string, error) {
 	} else if !inRepo {
 		return "", errors.New("file not in this repository")
 	}
-	if isDir, err := util2.IsDirectory(path); err != nil {
+	if isDir, err := util.IsDirectory(path); err != nil {
 		return "", err
 	} else if !isDir {
 		return "", errors.New("not a directory")
@@ -178,7 +178,7 @@ func PrintTree(hash string) error {
 
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, entry := range entries {
-		_, err = util2.Fprintf(writer, "%s\t%s  \t%s\n", entry.Mode, entry.Hash, entry.Name)
+		_, err = util.Fprintf(writer, "%s\t%s  \t%s\n", entry.Mode, entry.Hash, entry.Name)
 		if err != nil {
 			return err
 		}
