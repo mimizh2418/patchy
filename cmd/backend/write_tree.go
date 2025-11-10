@@ -1,6 +1,7 @@
-package cmd
+package backend
 
 import (
+	"patchy/cmd"
 	"patchy/objects"
 	"patchy/util"
 
@@ -23,5 +24,5 @@ var writeTreeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(writeTreeCmd)
+	cmd.RootCmd.AddCommand(writeTreeCmd)
 }

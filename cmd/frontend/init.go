@@ -1,6 +1,7 @@
-package cmd
+package frontend
 
 import (
+	"patchy/cmd"
 	"patchy/repo"
 	"patchy/util"
 
@@ -29,5 +30,5 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd)
+	cmd.RootCmd.AddCommand(initCmd)
 }

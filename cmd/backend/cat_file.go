@@ -1,7 +1,8 @@
-package cmd
+package backend
 
 import (
 	"errors"
+	"patchy/cmd"
 	"patchy/objects"
 	"patchy/objects/objecttype"
 
@@ -32,5 +33,5 @@ var catFileCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(catFileCmd)
+	cmd.RootCmd.AddCommand(catFileCmd)
 }

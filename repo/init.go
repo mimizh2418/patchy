@@ -35,7 +35,7 @@ func Init(path string) (repoPath string, err error) {
 		return
 	}
 
-	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main\n"), 0666); err != nil {
+	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main"), 0666); err != nil {
 		return
 	}
 

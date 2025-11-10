@@ -7,20 +7,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "patchy <command> [<args>]",
 	Short: "Bad version control system",
 	Long:  `Patchy is a bad version control system`,
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
 }
 
 func init() {
-	rootCmd.SilenceUsage = true
-	rootCmd.PersistentFlags().BoolVarP(&util.Quiet, "quiet", "q", false, "suppress output")
+	RootCmd.SilenceUsage = true
+	RootCmd.PersistentFlags().BoolVarP(&util.Quiet, "quiet", "q", false, "suppress output")
 }

@@ -1,6 +1,7 @@
-package cmd
+package backend
 
 import (
+	"patchy/cmd"
 	"patchy/objects"
 	"patchy/util"
 
@@ -31,7 +32,7 @@ var commitMessage string
 var parentCommit string
 
 func init() {
-	rootCmd.AddCommand(commitTreeCmd)
+	cmd.RootCmd.AddCommand(commitTreeCmd)
 	commitTreeCmd.Flags().StringVarP(&commitMessage, "message", "m", "", "the commit message")
 	commitTreeCmd.Flags().StringVarP(&parentCommit, "parent", "p", "", "the parent commit hash")
 }

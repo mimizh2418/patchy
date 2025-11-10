@@ -1,6 +1,7 @@
-package cmd
+package backend
 
 import (
+	"patchy/cmd"
 	"patchy/refs"
 
 	"github.com/spf13/cobra"
@@ -17,5 +18,5 @@ var updateRefCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(updateRefCmd)
+	cmd.RootCmd.AddCommand(updateRefCmd)
 }

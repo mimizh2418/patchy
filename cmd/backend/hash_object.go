@@ -1,6 +1,7 @@
-package cmd
+package backend
 
 import (
+	"patchy/cmd"
 	"patchy/objects"
 	"patchy/util"
 
@@ -28,6 +29,6 @@ var hashObjectCmd = &cobra.Command{
 var write bool
 
 func init() {
-	rootCmd.AddCommand(hashObjectCmd)
+	cmd.RootCmd.AddCommand(hashObjectCmd)
 	hashObjectCmd.Flags().BoolVarP(&write, "write", "w", false, "write object into the object database")
 }
