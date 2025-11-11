@@ -5,6 +5,8 @@ import (
 	"patchy/refs"
 	"patchy/repo"
 	"patchy/util"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -34,8 +36,13 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 				return err
 			}
 			headCommit := head
+			branchName := "detached HEAD"
 			if !detached {
+				branchName = filepath.Base(head)
 				headCommit, err = refs.ResolveRef(head)
+				if err != nil {
+					return err
+				}
 			} else {
 				util.Println("Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
 			}
@@ -51,6 +58,8 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 			if !detached {
 				err = refs.UpdateRef(head, hash)
 			}
+
+			util.Printf("[%s %s] %s\n", branchName, hash[:7], strings.SplitN(commitMessage, "\n", 2)[0])
 			return nil
 		},
 	}

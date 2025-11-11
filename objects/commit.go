@@ -20,9 +20,10 @@ type Commit struct {
 }
 
 func WriteCommit(tree string, parent *string, message string) (string, error) {
-	if !objectExists(tree) {
-		return "", fmt.Errorf("tree object %s does not exist", tree)
+	if err := ResolveAndValidateObject(&tree); err != nil {
+		return "", err
 	}
+
 	currentUser, err := user.Current()
 	if err != nil {
 		return "", err
@@ -149,7 +150,6 @@ func PrintCommit(hash string) error {
 	if err != nil {
 		return err
 	}
-	util.Printf("commit %s\n", hash)
 	util.Printf("tree %s\n", commit.Tree)
 	if commit.Parent != nil {
 		util.Printf("parent %s\n", *commit.Parent)

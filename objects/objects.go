@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -16,22 +15,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-func validateObjectHash(hash string) error {
-	repoDir, err := repo.FindRepoDir()
-	if err != nil {
-		return err
-	}
-	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
-		return fmt.Errorf("\"%s\" is not a valid object id", hash)
-	}
-	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", hash[:2], hash[2:])); err == nil && !exists {
-		return fmt.Errorf("object %s not found", hash)
-	} else if err != nil {
-		return err
-	}
-	return nil
-}
 
 func objectExists(hash string) bool {
 	repoDir, err := repo.FindRepoDir()
@@ -111,13 +94,14 @@ func ReadObjectType(hash string) (objecttype.ObjectType, error) {
 	if err != nil {
 		return objecttype.Unknown, err
 	}
+	if err := ResolveAndValidateObject(&hash); err != nil {
+		return objecttype.Unknown, err
+	}
 
 	dir := filepath.Join(repoDir, "objects", hash[:2])
 	file := filepath.Join(dir, hash[2:])
 	compressedData, err := os.ReadFile(file)
-	if errors.Is(err, os.ErrNotExist) {
-		return objecttype.Unknown, fmt.Errorf("object %s not found", hash)
-	} else if err != nil {
+	if err != nil {
 		return objecttype.Unknown, err
 	}
 
@@ -160,13 +144,14 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 	if err != nil {
 		return objecttype.Unknown, nil, err
 	}
+	if err := ResolveAndValidateObject(&hash); err != nil {
+		return objecttype.Unknown, nil, err
+	}
 
 	dir := filepath.Join(repoDir, "objects", hash[:2])
 	file := filepath.Join(dir, hash[2:])
 	compressedData, err := os.ReadFile(file)
-	if errors.Is(err, os.ErrNotExist) {
-		return objecttype.Unknown, nil, fmt.Errorf("object %s not found", hash)
-	} else if err != nil {
+	if err != nil {
 		return objecttype.Unknown, nil, err
 	}
 

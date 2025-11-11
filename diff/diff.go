@@ -80,11 +80,11 @@ func PrintDiff(ops []Operation) {
 	for _, op := range ops {
 		switch op.Type {
 		case Equal:
-			_, _ = util.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
+			util.Fprintln(writer, white.Sprintf("\t%d\t \t%s", op.OldLine, op.NewText))
 		case Insert:
-			_, _ = util.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
+			util.Fprintln(writer, green.Sprintf("+\t \t%d\t%s", op.NewLine, op.NewText))
 		case Delete:
-			_, _ = util.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
+			util.Fprintln(writer, red.Sprintf("-\t%d\t \t%s", op.OldLine, op.OldText))
 		}
 	}
 

@@ -3,6 +3,8 @@ package util
 import (
 	"fmt"
 	"io"
+
+	"github.com/fatih/color"
 )
 
 var Quiet bool
@@ -25,23 +27,38 @@ func Printf(format string, a ...any) {
 	}
 }
 
-func Fprint(writer io.Writer, a ...any) (n int, err error) {
-	if Quiet {
-		return 0, nil
+func ColorPrint(attribute color.Attribute, a ...any) {
+	if !Quiet {
+		_, _ = color.New(attribute).Print(a...)
 	}
-	return fmt.Fprint(writer, a...)
 }
 
-func Fprintln(writer io.Writer, a ...any) (n int, err error) {
-	if Quiet {
-		return 0, nil
+func ColorPrintln(attribute color.Attribute, a ...any) {
+	if !Quiet {
+		_, _ = color.New(attribute).Println(a...)
 	}
-	return fmt.Fprintln(writer, a...)
 }
 
-func Fprintf(writer io.Writer, format string, a ...any) (n int, err error) {
-	if Quiet {
-		return 0, nil
+func ColorPrintf(attribute color.Attribute, format string, a ...any) {
+	if !Quiet {
+		_, _ = color.New(attribute).Printf(format, a...)
 	}
-	return fmt.Fprintf(writer, format, a...)
+}
+
+func Fprint(writer io.Writer, a ...any) {
+	if !Quiet {
+		_, _ = fmt.Fprint(writer, a...)
+	}
+}
+
+func Fprintln(writer io.Writer, a ...any) {
+	if !Quiet {
+		_, _ = fmt.Fprintln(writer, a...)
+	}
+}
+
+func Fprintf(writer io.Writer, format string, a ...any) {
+	if !Quiet {
+		_, _ = fmt.Fprintf(writer, format, a...)
+	}
 }
