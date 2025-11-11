@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -59,7 +60,8 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 				err = refs.UpdateRef(head, hash)
 			}
 
-			util.Printf("[%s %s] %s\n", branchName, hash[:7], strings.SplitN(commitMessage, "\n", 2)[0])
+			util.ColorPrintf(color.FgYellow, "[%s %s]", branchName, hash[:7])
+			util.Println(strings.SplitN(commitMessage, "\n", 2)[0])
 			return nil
 		},
 	}

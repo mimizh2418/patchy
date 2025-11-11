@@ -7,7 +7,6 @@ import (
 	"patchy/repo"
 	"patchy/util"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -32,7 +31,11 @@ func ResolveAndValidateObject(shortHash *string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := strconv.ParseUint(*shortHash, 16, 64); err != nil || len(*shortHash) < 4 || len(*shortHash) > 40 {
+	decodeCheckString := *shortHash
+	if len(decodeCheckString)%2 != 0 {
+		decodeCheckString += "0"
+	}
+	if _, err := hex.DecodeString(decodeCheckString); err != nil || len(*shortHash) < 4 || len(*shortHash) > 40 {
 		return fmt.Errorf("\"%s\" is not a valid object id", *shortHash)
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", (*shortHash)[:2])); err == nil && !exists {
