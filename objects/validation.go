@@ -16,7 +16,7 @@ func ValidateObject(hash string) error {
 		return err
 	}
 	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
-		return fmt.Errorf("\"%s\" is not a valid object id", hash)
+		return fmt.Errorf("'%s' is not a valid object id", hash)
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", hash[:2], hash[2:])); err == nil && !exists {
 		return fmt.Errorf("object %s not found", hash)
@@ -36,7 +36,7 @@ func ResolveAndValidateObject(shortHash *string) error {
 		decodeCheckString += "0"
 	}
 	if _, err := hex.DecodeString(decodeCheckString); err != nil || len(*shortHash) < 4 || len(*shortHash) > 40 {
-		return fmt.Errorf("\"%s\" is not a valid object id", *shortHash)
+		return fmt.Errorf("'%s' is not a valid object id", *shortHash)
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", (*shortHash)[:2])); err == nil && !exists {
 		return fmt.Errorf("object %s not found", *shortHash)
