@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +16,22 @@ import (
 	"strconv"
 	"strings"
 )
+
+func validateObjectHash(hash string) error {
+	repoDir, err := repo.FindRepoDir()
+	if err != nil {
+		return err
+	}
+	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
+		return fmt.Errorf("\"%s\" is not a valid object id", hash)
+	}
+	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", hash[:2], hash[2:])); err == nil && !exists {
+		return fmt.Errorf("object %s not found", hash)
+	} else if err != nil {
+		return err
+	}
+	return nil
+}
 
 func objectExists(hash string) bool {
 	repoDir, err := repo.FindRepoDir()
