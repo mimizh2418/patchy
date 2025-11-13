@@ -1,6 +1,7 @@
 package commit
 
 import (
+	"patchy/diff"
 	"patchy/objects"
 	"patchy/refs"
 	"patchy/repo"
@@ -60,8 +61,20 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 				err = refs.UpdateRef(head, hash)
 			}
 
-			util.ColorPrintf(color.FgYellow, "[%s %s]", branchName, hash[:7])
+			util.ColorPrintf(color.FgCyan, "[%s %s] ", branchName, hash[:7])
 			util.Println(strings.SplitN(commitMessage, "\n", 2)[0])
+			if parent != nil {
+				parentCommit, err := objects.ReadCommit(*parent)
+				if err != nil {
+					return err
+				}
+				changes, err := diff.TreeDiff(treeHash, parentCommit.Tree)
+				if err != nil {
+					return err
+				}
+				diff.PrintDiffSummary(changes)
+			}
+
 			return nil
 		},
 	}

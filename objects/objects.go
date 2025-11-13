@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +16,9 @@ import (
 	"strconv"
 	"strings"
 )
+
+var objCache = make(map[string][]byte)
+var objTypeCache = make(map[string]objecttype.ObjectType)
 
 func objectExists(hash string) bool {
 	repoDir, err := repo.FindRepoDir()
@@ -69,7 +73,7 @@ func WriteObject(hash string, data []byte) error {
 		return err
 	}
 
-	if len(hash) != 40 {
+	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
 		return errors.New("invalid hash")
 	}
 	dir := filepath.Join(repoDir, "objects", hash[:2])
@@ -147,6 +151,9 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 	if err := ResolveAndValidateObject(&hash); err != nil {
 		return objecttype.Unknown, nil, err
 	}
+	if data, ok := objCache[hash]; ok {
+		return objTypeCache[hash], data, nil
+	}
 
 	dir := filepath.Join(repoDir, "objects", hash[:2])
 	file := filepath.Join(dir, hash[2:])
@@ -194,5 +201,7 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 	default:
 		return objecttype.Unknown, nil, errors.New("invalid object type")
 	}
+	objCache[hash] = content
+	objTypeCache[hash] = objType
 	return objType, content, nil
 }
