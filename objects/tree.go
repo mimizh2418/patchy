@@ -122,7 +122,8 @@ func ReadTree(hash string) ([]TreeEntry, error) {
 		return nil, fmt.Errorf("WriteTree: %w", err)
 	}
 	if objType != objecttype.Tree {
-		return nil, fmt.Errorf("WriteTree: %w", &ErrObjectTypeMismatch{hash, objecttype.Tree, objType})
+		return nil, fmt.Errorf(
+			"WriteTree: %w", &ErrObjectTypeMismatch{hash, objecttype.Tree, objType})
 	}
 	entries := make([]TreeEntry, 0)
 	i := 0

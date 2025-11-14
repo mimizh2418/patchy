@@ -17,7 +17,9 @@ func UpdateRef(ref string, commitHash string) error {
 		return fmt.Errorf("UpdateRef: %w", err)
 	}
 	if objType, err := objects.ReadObjectType(commitHash); err == nil && objType != objecttype.Commit {
-		return fmt.Errorf("UpdateRef: %w", &objects.ErrObjectTypeMismatch{Hash: commitHash, Expected: objecttype.Commit, Actual: objType})
+		return fmt.Errorf(
+			"UpdateRef: %w",
+			&objects.ErrObjectTypeMismatch{Hash: commitHash, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
 		return fmt.Errorf("UpdateRef: %w", err)
 	}
@@ -36,7 +38,9 @@ func ResolveRef(ref string) (string, error) {
 	if data, err := os.ReadFile(filepath.Join(repoDir, ref)); err == nil {
 		hash := string(data)
 		if objType, err := objects.ReadObjectType(hash); err == nil && objType != objecttype.Commit {
-			return "", fmt.Errorf("ResolveRef: %w", &objects.ErrObjectTypeMismatch{Hash: hash, Expected: objecttype.Commit, Actual: objType})
+			return "", fmt.Errorf(
+				"ResolveRef: %w",
+				&objects.ErrObjectTypeMismatch{Hash: hash, Expected: objecttype.Commit, Actual: objType})
 		} else if err != nil {
 			return "", fmt.Errorf("ResolveRef: %w", err)
 		}
@@ -64,7 +68,9 @@ func ReadHead() (bool, string, error) {
 	}
 
 	if objType, err := objects.ReadObjectType(content); err == nil && objType != objecttype.Commit {
-		return false, "", fmt.Errorf("ReadHead: %w", &objects.ErrObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
+		return false, "", fmt.Errorf(
+			"ReadHead: %w",
+			&objects.ErrObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
 		return false, "", fmt.Errorf("ReadHead: %w", err)
 	}

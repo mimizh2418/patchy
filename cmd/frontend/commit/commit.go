@@ -19,8 +19,8 @@ func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "commit [--message <message>]",
 		Short: "Create a new commit recording the current state of the repository",
-		Long: `Creates a new commit containing the current state of the repository. The new commit will be a child of HEAD, 
-and the HEAD reference will be updated to point to the new commit, unless in a detached HEAD state.`,
+		Long: `Creates a new commit containing the current state of the repository. The new commit will be a child of 
+HEAD, and the HEAD reference will be updated to point to the new commit, unless in a detached HEAD state.`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repoRoot, err := repo.FindRepoRoot()
@@ -46,14 +46,24 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 					return err
 				}
 			} else {
-				util.Println("Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
+				util.ColorPrintln(
+					color.FgYellow,
+					"Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
 			}
-			var parent *string = nil
+			var parentHash *string = nil
 			if len(headCommit) > 0 {
-				parent = &headCommit
+				parentHash = &headCommit
+				parent, err := objects.ReadCommit(*parentHash)
+				if err != nil {
+					return err
+				}
+				if parent.Tree == treeHash {
+					util.Println("Nothing to commit, working tree clean")
+					return nil
+				}
 			}
 
-			hash, err := objects.WriteCommit(treeHash, parent, commitMessage)
+			hash, err := objects.WriteCommit(treeHash, parentHash, commitMessage)
 			if err != nil {
 				return err
 			}
@@ -63,8 +73,8 @@ and the HEAD reference will be updated to point to the new commit, unless in a d
 
 			util.ColorPrintf(color.FgCyan, "[%s %s] ", branchName, hash[:7])
 			util.Println(strings.SplitN(commitMessage, "\n", 2)[0])
-			if parent != nil {
-				parentCommit, err := objects.ReadCommit(*parent)
+			if parentHash != nil {
+				parentCommit, err := objects.ReadCommit(*parentHash)
 				if err != nil {
 					return err
 				}

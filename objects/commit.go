@@ -132,7 +132,9 @@ func ReadCommit(hash string) (*Commit, error) {
 			return nil, fmt.Errorf("ReadCommit: bad parent, %w", &ErrBadObjectID{hash})
 		}
 		if objType, err := ReadObjectType(parentHash); err == nil && objType != objecttype.Commit {
-			return nil, fmt.Errorf("ReadCommit: bad parent, %w ", &ErrObjectTypeMismatch{parentHash, objecttype.Commit, objType})
+			return nil, fmt.Errorf(
+				"ReadCommit: bad parent, %w ",
+				&ErrObjectTypeMismatch{parentHash, objecttype.Commit, objType})
 		} else if err != nil {
 			return nil, fmt.Errorf("ReadCommit: %w", err)
 		}

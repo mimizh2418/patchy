@@ -27,7 +27,8 @@ func ReadBlob(hash string) ([]byte, error) {
 		return nil, fmt.Errorf("ReadBlob: %w", err)
 	}
 	if objType != objecttype.Blob {
-		return nil, fmt.Errorf("ReadBlob: %w", &ErrObjectTypeMismatch{hash, objecttype.Blob, objType})
+		return nil, fmt.Errorf(
+			"ReadBlob: %w", &ErrObjectTypeMismatch{hash, objecttype.Blob, objType})
 	}
 	return blob, nil
 }
