@@ -4,9 +4,7 @@ import (
 	"errors"
 	"patchy/objects"
 	"patchy/objects/objecttype"
-	"patchy/util"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +21,10 @@ func NewCommand() *cobra.Command {
 			}
 			switch objType {
 			case objecttype.Blob:
-				util.ColorPrintf(color.FgCyan, "[blob %s]\n", args[0])
 				return objects.PrintBlob(args[0])
 			case objecttype.Tree:
-				util.ColorPrintf(color.FgCyan, "[tree %s]\n", args[0])
 				return objects.PrintTree(args[0])
 			case objecttype.Commit:
-				util.ColorPrintf(color.FgCyan, "[commit %s]\n", args[0])
 				return objects.PrintCommit(args[0])
 			default:
 				return errors.New("unknown object type")

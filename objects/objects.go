@@ -95,7 +95,7 @@ func ReadObjectType(hash string) (objecttype.ObjectType, error) {
 	if err != nil {
 		return objecttype.Unknown, err
 	}
-	if err := ResolveAndValidateObject(&hash); err != nil {
+	if err := resolveAndValidateObject(&hash); err != nil {
 		return objecttype.Unknown, err
 	}
 
@@ -145,7 +145,7 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 	if err != nil {
 		return objecttype.Unknown, nil, err
 	}
-	if err := ResolveAndValidateObject(&hash); err != nil {
+	if err := resolveAndValidateObject(&hash); err != nil {
 		return objecttype.Unknown, nil, err
 	}
 	if data, ok := objCache[hash]; ok {

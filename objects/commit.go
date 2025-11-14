@@ -9,6 +9,8 @@ import (
 	"patchy/util"
 	"strconv"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 type Commit struct {
@@ -20,7 +22,7 @@ type Commit struct {
 }
 
 func WriteCommit(tree string, parent *string, message string) (string, error) {
-	if err := ResolveAndValidateObject(&tree); err != nil {
+	if err := resolveAndValidateObject(&tree); err != nil {
 		return "", err
 	}
 
@@ -145,6 +147,7 @@ func PrintCommit(hash string) error {
 	if err != nil {
 		return err
 	}
+	util.ColorPrintf(color.FgCyan, "[commit %s]\n", resolveObject(hash))
 	util.Printf("tree %s\n", commit.Tree)
 	if commit.Parent != nil {
 		util.Printf("parent %s\n", *commit.Parent)

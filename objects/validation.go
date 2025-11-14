@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func ValidateObject(hash string) error {
+func validateObject(hash string) error {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
 		return err
@@ -26,7 +26,36 @@ func ValidateObject(hash string) error {
 	return nil
 }
 
-func ResolveAndValidateObject(shortHash *string) error {
+func resolveObject(shortHash string) string {
+	repoDir, err := repo.FindRepoDir()
+	if err != nil {
+		return ""
+	}
+	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", shortHash[:2])); err == nil && !exists {
+		return ""
+	}
+	matches := make([]string, 0)
+	objectsDir := filepath.Join(repoDir, "objects", shortHash[:2])
+	err = filepath.WalkDir(objectsDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if strings.HasPrefix(d.Name(), shortHash[2:]) {
+			matches = append(matches, shortHash[:2]+d.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		return ""
+	}
+
+	if len(matches) == 1 {
+		return matches[0]
+	}
+	return ""
+}
+
+func resolveAndValidateObject(shortHash *string) error {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
 		return err

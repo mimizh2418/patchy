@@ -11,6 +11,8 @@ import (
 	"patchy/util"
 	"path/filepath"
 	"text/tabwriter"
+
+	"github.com/fatih/color"
 )
 
 type TreeEntry struct {
@@ -196,6 +198,7 @@ func PrintTree(hash string) error {
 		return err
 	}
 
+	util.ColorPrintf(color.FgCyan, "[tree %s]\n", resolveObject(hash))
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, entry := range entries {
 		util.Fprintf(writer, "%s\t%s  \t%s\n", entry.Mode, entry.Hash, entry.Name)

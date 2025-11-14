@@ -5,6 +5,8 @@ import (
 	"os"
 	"patchy/objects/objecttype"
 	"patchy/util"
+
+	"github.com/fatih/color"
 )
 
 func WriteBlob(filename string) (string, error) {
@@ -35,6 +37,7 @@ func PrintBlob(hash string) error {
 	if err != nil {
 		return err
 	}
+	util.ColorPrintf(color.FgCyan, "[blob %s]\n", resolveObject(hash))
 	util.Println(string(data))
 	return nil
 }
