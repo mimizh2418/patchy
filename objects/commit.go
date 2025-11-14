@@ -154,7 +154,7 @@ func PrintCommit(hash string) error {
 	util.Printf("author %s\n", commit.Author)
 	util.Printf("date %s\n\n", commit.Time.Format(time.RubyDate))
 	if commit.Message != "" {
-		util.Printf("    %s\n", commit.Message)
+		util.Printf("    %s\n\n", commit.Message)
 	}
 	return nil
 }
