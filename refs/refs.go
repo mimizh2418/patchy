@@ -14,16 +14,16 @@ import (
 func UpdateRef(ref string, commitHash string) error {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateRef: %w", err)
 	}
 	if objType, err := objects.ReadObjectType(commitHash); err == nil && objType != objecttype.Commit {
-		return fmt.Errorf("object %s is not a commit", commitHash)
+		return fmt.Errorf("UpdateRef: %w", &objects.ErrObjectTypeMismatch{Hash: commitHash, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
-		return err
+		return fmt.Errorf("UpdateRef: %w", err)
 	}
 
 	if err := os.WriteFile(filepath.Join(repoDir, ref), []byte(commitHash), 0666); err != nil {
-		return err
+		return fmt.Errorf("UpdateRef: %w", err)
 	}
 	return nil
 }
@@ -31,31 +31,32 @@ func UpdateRef(ref string, commitHash string) error {
 func ResolveRef(ref string) (string, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("UpdateRef: %w", err)
 	}
 	if data, err := os.ReadFile(filepath.Join(repoDir, ref)); err == nil {
 		hash := string(data)
 		if objType, err := objects.ReadObjectType(hash); err == nil && objType != objecttype.Commit {
-			return "", fmt.Errorf("object %s is not a commit", hash)
+			return "", fmt.Errorf("ResolveRef: %w", &objects.ErrObjectTypeMismatch{Hash: hash, Expected: objecttype.Commit, Actual: objType})
 		} else if err != nil {
-			return "", err
+			return "", fmt.Errorf("ResolveRef: %w", err)
 		}
 		return hash, nil
 	} else if errors.Is(err, os.ErrNotExist) {
 		return "", nil
 	} else {
-		return "", err
+		return "", fmt.Errorf("ResolveRef: %w", err)
 	}
 }
 
 func ReadHead() (bool, string, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return false, "", err
+		return false, "", fmt.Errorf("UpdateRef: %w", err)
 	}
 	data, err := os.ReadFile(filepath.Join(repoDir, "HEAD"))
 	if err != nil {
-		return false, "", err
+		return false, "", fmt.Errorf("ReadHead: %w", err)
+
 	}
 	content := strings.Split(string(data), "\n")[0]
 	if strings.HasPrefix(content, "ref: ") {
@@ -63,9 +64,9 @@ func ReadHead() (bool, string, error) {
 	}
 
 	if objType, err := objects.ReadObjectType(content); err == nil && objType != objecttype.Commit {
-		return false, "", fmt.Errorf("object %s is not a commit", content)
+		return false, "", fmt.Errorf("ReadHead: %w", &objects.ErrObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
-		return false, "", err
+		return false, "", fmt.Errorf("ReadHead: %w", err)
 	}
 	return true, content, nil
 }

@@ -2,7 +2,6 @@ package objects
 
 import (
 	"encoding/hex"
-	"fmt"
 	"io/fs"
 	"patchy/repo"
 	"patchy/util"
@@ -16,10 +15,10 @@ func validateObject(hash string) error {
 		return err
 	}
 	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
-		return fmt.Errorf("'%s' is not a valid object id", hash)
+		return &ErrBadObjectID{hash}
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", hash[:2], hash[2:])); err == nil && !exists {
-		return fmt.Errorf("object %s not found", hash)
+		return &ErrObjectNotFound{hash}
 	} else if err != nil {
 		return err
 	}
@@ -65,10 +64,10 @@ func resolveAndValidateObject(shortHash *string) error {
 		decodeCheckString += "0"
 	}
 	if _, err := hex.DecodeString(decodeCheckString); err != nil || len(*shortHash) < 4 || len(*shortHash) > 40 {
-		return fmt.Errorf("'%s' is not a valid object id", *shortHash)
+		return &ErrBadObjectID{*shortHash}
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", (*shortHash)[:2])); err == nil && !exists {
-		return fmt.Errorf("object %s not found", *shortHash)
+		return &ErrObjectNotFound{*shortHash}
 	}
 	matches := make([]string, 0)
 	objectsDir := filepath.Join(repoDir, "objects", (*shortHash)[:2])
@@ -86,11 +85,11 @@ func resolveAndValidateObject(shortHash *string) error {
 	}
 
 	if len(matches) == 0 {
-		return fmt.Errorf("object %s not found", *shortHash)
+		return &ErrObjectNotFound{*shortHash}
 	}
 	if len(matches) == 1 {
 		*shortHash = matches[0]
 		return nil
 	}
-	return fmt.Errorf("multiple objects found with prefix %s: %v", *shortHash, matches)
+	return &ErrAmbiguousObjectID{*shortHash, matches}
 }

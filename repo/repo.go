@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"errors"
 	"os"
 	"patchy/util"
 	"path/filepath"
@@ -32,7 +31,7 @@ func FindRepoDir() (string, error) {
 		}
 		dir = filepath.Dir(dir)
 	}
-	return "", errors.New("current directory is not part of a repository")
+	return "", &ErrNotInRepo{}
 }
 
 func FindRepoRoot() (string, error) {

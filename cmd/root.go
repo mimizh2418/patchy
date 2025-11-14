@@ -11,6 +11,7 @@ import (
 	"patchy/cmd/frontend/initialize"
 	"patchy/util"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -23,12 +24,14 @@ var RootCmd = &cobra.Command{
 func Execute() {
 	err := RootCmd.Execute()
 	if err != nil {
+		util.ColorFprintln(color.FgHiRed, os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 }
 
 func init() {
 	RootCmd.SilenceUsage = true
+	RootCmd.SilenceErrors = true
 	RootCmd.PersistentFlags().BoolVarP(&util.Quiet, "quiet", "q", false, "suppress output")
 
 	RootCmd.AddCommand(catfile.NewCommand())

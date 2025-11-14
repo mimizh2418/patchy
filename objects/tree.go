@@ -2,7 +2,6 @@ package objects
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"os"
 	"patchy/ignore"
@@ -25,30 +24,30 @@ type TreeEntry struct {
 func WriteTree(path string) (string, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	}
 	repoRoot := filepath.Dir(repoDir)
 
 	// Validate path
-	if exists, err := util.DoesFileExist(path); err != nil {
-		return "", err
+	if exists, err := util.DoesFileExist(path); err == nil && !exists {
+		return "", fmt.Errorf("WriteTree: file %s does not exist", path)
 	} else if !exists {
-		return "", nil
+		return "", fmt.Errorf("WriteTree: %w", err)
 	}
 	if inRepo, err := repo.IsFileInRepo(path); err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	} else if !inRepo {
-		return "", errors.New("file not in this repository")
+		return "", fmt.Errorf("WriteTree: %w", &repo.ErrFileNotInRepo{Path: path})
 	}
 	if isDir, err := util.IsDirectory(path); err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	} else if !isDir {
-		return "", errors.New("not a directory")
+		return "", fmt.Errorf("WriteTree: file %s is not a directory", path)
 	}
 
 	ignoreList, err := ignore.ReadIgnoreFile()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	}
 	entries := make([]TreeEntry, 0)
 	err = filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
@@ -97,14 +96,14 @@ func WriteTree(path string) (string, error) {
 		return nil
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	}
 	data := make([]byte, 0)
 	for _, entry := range entries {
 		entryData := []byte(fmt.Sprintf("%s\000%s\000", entry.Mode, entry.Name))
 		rawHash, err := hex.DecodeString(entry.Hash)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("WriteTree: %w", err)
 		}
 		entryData = append(entryData, rawHash...)
 		data = append(data, entryData...)
@@ -112,7 +111,7 @@ func WriteTree(path string) (string, error) {
 
 	hash, err := WriteObject(objecttype.Tree, data)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("WriteTree: %w", err)
 	}
 	return hash, nil
 }
@@ -120,10 +119,10 @@ func WriteTree(path string) (string, error) {
 func ReadTree(hash string) ([]TreeEntry, error) {
 	objType, data, err := ReadObject(hash)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("WriteTree: %w", err)
 	}
 	if objType != objecttype.Tree {
-		return nil, fmt.Errorf("object %s is not a tree", hash)
+		return nil, fmt.Errorf("WriteTree: %w", &ErrObjectTypeMismatch{hash, objecttype.Tree, objType})
 	}
 	entries := make([]TreeEntry, 0)
 	i := 0
@@ -132,7 +131,7 @@ func ReadTree(hash string) ([]TreeEntry, error) {
 		for data[modeEnd] != 0 {
 			modeEnd++
 			if modeEnd >= len(data) {
-				return nil, errors.New("invalid tree format")
+				return nil, fmt.Errorf("WriteTree: %w", &ErrBadObject{hash, "format"})
 			}
 		}
 		mode := string(data[i:modeEnd])
@@ -142,14 +141,14 @@ func ReadTree(hash string) ([]TreeEntry, error) {
 		for data[nameEnd] != 0 {
 			nameEnd++
 			if nameEnd >= len(data) {
-				return nil, errors.New("invalid tree format")
+				return nil, fmt.Errorf("WriteTree: %w", &ErrBadObject{hash, "format"})
 			}
 		}
 		name := string(data[i:nameEnd])
 		i = nameEnd + 1
 
 		if i+20 > len(data) {
-			return nil, errors.New("invalid tree format")
+			return nil, fmt.Errorf("WriteTree: %w", &ErrBadObject{hash, "format"})
 		}
 		rawHash := data[i : i+20]
 		hash := hex.EncodeToString(rawHash)
@@ -195,7 +194,7 @@ func FlattenTreeEntries(entries []TreeEntry) []TreeEntry {
 func PrintTree(hash string) error {
 	entries, err := ReadTree(hash)
 	if err != nil {
-		return err
+		return fmt.Errorf("PrintTree: %w", err)
 	}
 
 	util.ColorPrintf(color.FgCyan, "[tree %s]\n", resolveObject(hash))

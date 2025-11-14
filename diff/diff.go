@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"fmt"
 	"patchy/objects"
 	"patchy/util"
 
@@ -27,11 +28,12 @@ type FileChange struct {
 func TreeDiff(newTree string, oldTree string) ([]FileChange, error) {
 	newEntries, err := objects.ReadTreeRecursive(newTree)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("TreeDiff: %w", err)
 	}
 	oldEntries, err := objects.ReadTreeRecursive(oldTree)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("TreeDiff: %w", err)
+
 	}
 	newEntries = objects.FlattenTreeEntries(newEntries)
 	oldEntries = objects.FlattenTreeEntries(oldEntries)

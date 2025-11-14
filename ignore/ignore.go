@@ -2,6 +2,7 @@ package ignore
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"patchy/repo"
 	"patchy/util"
@@ -18,13 +19,13 @@ func ReadIgnoreFile() ([]string, error) {
 
 	repoRoot, err := repo.FindRepoRoot()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadIgnoreFile: %w", err)
 	}
 
 	patterns := []string{".patchy/", ".git/"}
 	ignoreFileExists, err := util.DoesFileExist(filepath.Join(repoRoot, ".patchyignore"))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadIgnoreFile: %w", err)
 	}
 	if !ignoreFileExists {
 		return patterns, nil
@@ -35,7 +36,7 @@ func ReadIgnoreFile() ([]string, error) {
 		_ = f.Close()
 	}()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadIgnoreFile: %w", err)
 	}
 
 	scanner := bufio.NewScanner(f)

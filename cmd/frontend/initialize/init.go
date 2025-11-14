@@ -17,9 +17,9 @@ func NewCommand() *cobra.Command {
 			var repoPath string
 			var err error
 			if len(args) > 0 {
-				repoPath, err = repo.Init(args[0])
+				repoPath, err = repo.InitRepo(args[0])
 			} else {
-				repoPath, err = repo.Init(".")
+				repoPath, err = repo.InitRepo(".")
 			}
 			if err != nil {
 				return err
