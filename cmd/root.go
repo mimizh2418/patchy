@@ -4,8 +4,8 @@ import (
 	"os"
 	"patchy/cmd/backend/catfile"
 	"patchy/cmd/backend/committree"
-	"patchy/cmd/backend/hashobject"
 	"patchy/cmd/backend/updateref"
+	"patchy/cmd/backend/writeblob"
 	"patchy/cmd/backend/writetree"
 	"patchy/cmd/frontend/commit"
 	"patchy/cmd/frontend/initialize"
@@ -33,7 +33,7 @@ func init() {
 
 	RootCmd.AddCommand(catfile.NewCommand())
 	RootCmd.AddCommand(committree.NewCommand())
-	RootCmd.AddCommand(hashobject.NewCommand())
+	RootCmd.AddCommand(writeblob.NewCommand())
 	RootCmd.AddCommand(updateref.NewCommand())
 	RootCmd.AddCommand(writetree.NewCommand())
 

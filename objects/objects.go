@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -59,38 +58,36 @@ func computeHash(data []byte) string {
 	return fmt.Sprintf("%x", sha1.Sum(data))
 }
 
-func HashObject(filename string) (string, []byte, error) {
-	blob, err := makeBlob(filename)
-	if err != nil {
-		return "", nil, err
-	}
-	return computeHash(blob), blob, nil
-}
-
-func WriteObject(hash string, data []byte) error {
+func WriteObject(objType objecttype.ObjectType, data []byte) (string, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return err
+		return "", err
+	}
+	header := []byte(fmt.Sprintf("%s %d\000", objType.String(), len(data)))
+	contents := append(header, data...)
+	hash := computeHash(contents)
+	if objectExists(hash) {
+		objCache[hash] = data
+		objTypeCache[hash] = objType
+		return hash, nil
 	}
 
-	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
-		return errors.New("invalid hash")
-	}
 	dir := filepath.Join(repoDir, "objects", hash[:2])
 	file := filepath.Join(dir, hash[2:])
-
-	compressedData, err := compressObject(data)
+	compressedData, err := compressObject(contents)
 	if err != nil {
-		return err
+		return "", err
 	}
-
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		return err
+		return "", err
 	}
 	if err := os.WriteFile(file, compressedData, 0666); err != nil {
-		return err
+		return "", err
 	}
-	return nil
+
+	objCache[hash] = data
+	objTypeCache[hash] = objType
+	return hash, nil
 }
 
 func ReadObjectType(hash string) (objecttype.ObjectType, error) {

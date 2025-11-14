@@ -90,15 +90,7 @@ func WriteTree(path string) (string, error) {
 			entries = append(entries, TreeEntry{"040000", name, hash, []TreeEntry{}})
 			return filepath.SkipDir
 		}
-		hash, data, err := HashObject(file)
-		if err != nil {
-			return err
-		}
-		if !objectExists(hash) {
-			if err = WriteObject(hash, data); err != nil {
-				return err
-			}
-		}
+		hash, err := WriteBlob(file)
 		entries = append(entries, TreeEntry{"100644", name, hash, []TreeEntry{}})
 		return nil
 	})
@@ -115,14 +107,9 @@ func WriteTree(path string) (string, error) {
 		entryData = append(entryData, rawHash...)
 		data = append(data, entryData...)
 	}
-	header := []byte(fmt.Sprintf("tree %d\000", len(data)))
-	data = append(header, data...)
 
-	hash := computeHash(data)
-	if objectExists(hash) {
-		return hash, nil
-	}
-	if err = WriteObject(hash, data); err != nil {
+	hash, err := WriteObject(objecttype.Tree, data)
+	if err != nil {
 		return "", err
 	}
 	return hash, nil

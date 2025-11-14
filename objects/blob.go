@@ -7,13 +7,16 @@ import (
 	"patchy/util"
 )
 
-func makeBlob(filename string) ([]byte, error) {
+func WriteBlob(filename string) (string, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return []byte{}, err
+		return "", err
 	}
-	header := []byte(fmt.Sprintf("blob %d\000", len(data)))
-	return append(header, data...), nil
+	hash, err := WriteObject(objecttype.Blob, data)
+	if err != nil {
+		return "", err
+	}
+	return hash, nil
 }
 
 func ReadBlob(hash string) ([]byte, error) {

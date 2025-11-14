@@ -47,13 +47,8 @@ func WriteCommit(tree string, parent *string, message string) (string, error) {
 		}
 		data = append(data, rawParentHash...)
 	}
-	header := []byte(fmt.Sprintf("commit %d\000", len(data)))
-	data = append(header, data...)
-	hash := computeHash(data)
-	if objectExists(hash) {
-		return hash, nil
-	}
-	if err = WriteObject(hash, data); err != nil {
+	hash, err := WriteObject(objecttype.Commit, data)
+	if err != nil {
 		return "", err
 	}
 	return hash, nil
