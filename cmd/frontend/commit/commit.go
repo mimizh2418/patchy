@@ -33,26 +33,13 @@ HEAD, and the HEAD reference will be updated to point to the new commit, unless 
 				return err
 			}
 
-			detached, head, err := refs.ReadHead()
+			headStatus, err := refs.ReadHead()
 			if err != nil {
 				return err
 			}
-			headCommit := head
-			branchName := "detached HEAD"
-			if !detached {
-				branchName = filepath.Base(head)
-				headCommit, err = refs.ResolveRef(head)
-				if err != nil {
-					return err
-				}
-			} else {
-				util.ColorPrintln(
-					color.FgYellow,
-					"Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
-			}
 			var parentHash *string = nil
-			if len(headCommit) > 0 {
-				parentHash = &headCommit
+			if len(headStatus.Commit) > 0 {
+				parentHash = &headStatus.Commit
 				parent, err := objects.ReadCommit(*parentHash)
 				if err != nil {
 					return err
@@ -62,29 +49,38 @@ HEAD, and the HEAD reference will be updated to point to the new commit, unless 
 					return nil
 				}
 			}
-
 			hash, err := objects.WriteCommit(treeHash, parentHash, commitMessage)
 			if err != nil {
 				return err
 			}
-			if !detached {
-				err = refs.UpdateRef(head, hash)
+			if !headStatus.Detached {
+				err = refs.UpdateRef(headStatus.Ref, hash)
 			}
 
+			var branchName string
+			if headStatus.Detached {
+				branchName = "detached HEAD"
+				util.ColorPrintln(
+					color.FgYellow,
+					"Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
+			} else {
+				branchName = filepath.Base(headStatus.Ref)
+			}
 			util.ColorPrintf(color.FgCyan, "[%s %s] ", branchName, hash[:7])
 			util.Println(strings.SplitN(commitMessage, "\n", 2)[0])
+			prevTreeHash := ""
 			if parentHash != nil {
 				parentCommit, err := objects.ReadCommit(*parentHash)
 				if err != nil {
 					return err
 				}
-				changes, err := diff.TreeDiff(treeHash, parentCommit.Tree)
-				if err != nil {
-					return err
-				}
-				diff.PrintDiffSummary(changes)
+				prevTreeHash = parentCommit.Tree
 			}
-
+			changes, err := diff.TreeDiff(treeHash, prevTreeHash)
+			if err != nil {
+				return err
+			}
+			diff.PrintDiffSummary(changes)
 			return nil
 		},
 	}

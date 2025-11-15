@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+type HeadState struct {
+	Detached bool
+	Ref      string
+	Commit   string
+}
+
 func UpdateRef(ref string, commitHash string) error {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
@@ -46,33 +52,39 @@ func ResolveRef(ref string) (string, error) {
 		}
 		return hash, nil
 	} else if errors.Is(err, os.ErrNotExist) {
-		return "", nil
+		return "", fmt.Errorf("ResolveRef: %w", &ErrInvalidRef{Ref: ref})
 	} else {
 		return "", fmt.Errorf("ResolveRef: %w", err)
 	}
 }
 
-func ReadHead() (bool, string, error) {
+func ReadHead() (*HeadState, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return false, "", fmt.Errorf("UpdateRef: %w", err)
+		return nil, fmt.Errorf("UpdateRef: %w", err)
 	}
 	data, err := os.ReadFile(filepath.Join(repoDir, "HEAD"))
 	if err != nil {
-		return false, "", fmt.Errorf("ReadHead: %w", err)
+		return nil, fmt.Errorf("ReadHead: %w", err)
 
 	}
 	content := strings.Split(string(data), "\n")[0]
 	if strings.HasPrefix(content, "ref: ") {
-		return false, strings.TrimPrefix(content, "ref: "), nil
+		ref := strings.TrimPrefix(content, "ref: ")
+		hash, err := ResolveRef(ref)
+		var invalidRefErr *ErrInvalidRef
+		if err != nil && !errors.As(err, &invalidRefErr) {
+			return nil, fmt.Errorf("ReadHead: %w", err)
+		}
+		return &HeadState{false, ref, hash}, nil
 	}
 
 	if objType, err := objects.ReadObjectType(content); err == nil && objType != objecttype.Commit {
-		return false, "", fmt.Errorf(
+		return nil, fmt.Errorf(
 			"ReadHead: %w",
 			&objects.ErrObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
-		return false, "", fmt.Errorf("ReadHead: %w", err)
+		return nil, fmt.Errorf("ReadHead: %w", err)
 	}
-	return true, content, nil
+	return &HeadState{true, "", content}, nil
 }
