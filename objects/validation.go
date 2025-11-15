@@ -54,7 +54,7 @@ func resolveObject(shortHash string) string {
 	return ""
 }
 
-func resolveAndValidateObject(shortHash *string) error {
+func ResolveAndValidateObject(shortHash *string) error {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
 		return err

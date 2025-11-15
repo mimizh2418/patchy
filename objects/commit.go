@@ -21,7 +21,7 @@ type Commit struct {
 }
 
 func WriteCommit(tree string, parent *string, message string) (string, error) {
-	if err := resolveAndValidateObject(&tree); err != nil {
+	if err := ResolveAndValidateObject(&tree); err != nil {
 		return "", fmt.Errorf("WriteCommit: bad tree, %w", err)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"patchy/objects"
 	"patchy/objects/objecttype"
+	"patchy/refs"
 
 	"github.com/spf13/cobra"
 )
@@ -15,6 +16,10 @@ func NewCommand() *cobra.Command {
 		Long:  `Outputs the contents or details of an object given its hash`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			hash, err := refs.ParseRev(args[0])
+			if err == nil {
+				args[0] = hash
+			}
 			objType, err := objects.ReadObjectType(args[0])
 			if err != nil {
 				return err

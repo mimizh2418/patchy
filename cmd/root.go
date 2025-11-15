@@ -4,6 +4,7 @@ import (
 	"os"
 	"patchy/cmd/backend/catfile"
 	"patchy/cmd/backend/committree"
+	"patchy/cmd/backend/parserev"
 	"patchy/cmd/backend/updateref"
 	"patchy/cmd/backend/writeblob"
 	"patchy/cmd/backend/writetree"
@@ -37,6 +38,7 @@ func init() {
 
 	RootCmd.AddCommand(catfile.NewCommand())
 	RootCmd.AddCommand(committree.NewCommand())
+	RootCmd.AddCommand(parserev.NewCommand())
 	RootCmd.AddCommand(writeblob.NewCommand())
 	RootCmd.AddCommand(updateref.NewCommand())
 	RootCmd.AddCommand(writetree.NewCommand())
