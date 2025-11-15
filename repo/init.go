@@ -8,7 +8,7 @@ import (
 
 func InitRepo(path string) (string, error) {
 	if _, e := FindRepoDir(); e == nil {
-		return "", fmt.Errorf("InitRepo: %w", &ErrAlreadyInRepo{})
+		return "", fmt.Errorf("InitRepo: %w", ErrAlreadyInRepo)
 	}
 
 	repoPath, err := filepath.Abs(filepath.Join(path, ".patchy"))

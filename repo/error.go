@@ -1,21 +1,17 @@
 package repo
 
-type ErrAlreadyInRepo struct{}
+import "errors"
 
-func (e *ErrAlreadyInRepo) Error() string {
-	return "current directory is already part of a repository"
-}
-
-type ErrNotInRepo struct{}
-
-func (*ErrNotInRepo) Error() string {
-	return "current directory is not inside of a repository"
-}
-
-type ErrFileNotInRepo struct {
+type FileNotInRepo struct {
 	Path string
 }
 
-func (e *ErrFileNotInRepo) Error() string {
+func (e *FileNotInRepo) Error() string {
 	return "file " + e.Path + " is not inside this repository"
 }
+
+var (
+	ErrAlreadyInRepo = errors.New("current directory is already part of a repository")
+	ErrNotInRepo     = errors.New("current directory is not inside of a repository")
+	ErrFileNotInRepo *FileNotInRepo
+)

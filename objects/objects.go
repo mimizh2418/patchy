@@ -118,7 +118,7 @@ func ReadObjectType(hash string) (objecttype.ObjectType, error) {
 	for buf[0] != 0 {
 		if n != 1 || err != nil {
 			return objecttype.Unknown, fmt.Errorf(
-				"ReadObjectType: %w", &ErrBadObject{hash, "format"})
+				"ReadObjectType: %w", &BadObject{hash, "format"})
 		}
 		headerBytes = append(headerBytes, buf[0])
 		n, err = reader.Read(buf)
@@ -126,7 +126,7 @@ func ReadObjectType(hash string) (objecttype.ObjectType, error) {
 	header := strings.Split(string(headerBytes), " ")
 	if len(header) != 2 {
 		return objecttype.Unknown, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "header"})
+			"ReadObjectType: %w", &BadObject{hash, "header"})
 	}
 
 	switch header[0] {
@@ -138,7 +138,7 @@ func ReadObjectType(hash string) (objecttype.ObjectType, error) {
 		return objecttype.Commit, nil
 	default:
 		return objecttype.Unknown, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "type"})
+			"ReadObjectType: %w", &BadObject{hash, "type"})
 	}
 }
 
@@ -175,19 +175,19 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 	}
 	if nullPos <= 0 {
 		return objecttype.Unknown, nil, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "format"})
+			"ReadObjectType: %w", &BadObject{hash, "format"})
 	}
 	header := strings.Split(string(blob[:nullPos]), " ")
 	content := blob[nullPos+1:]
 
 	if len(header) != 2 {
 		return objecttype.Unknown, nil, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "header"})
+			"ReadObjectType: %w", &BadObject{hash, "header"})
 	}
 	length, err := strconv.Atoi(header[1])
 	if err != nil || length != len(content) {
 		return objecttype.Unknown, nil, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "header"})
+			"ReadObjectType: %w", &BadObject{hash, "header"})
 	}
 
 	var objType objecttype.ObjectType
@@ -200,7 +200,7 @@ func ReadObject(hash string) (objecttype.ObjectType, []byte, error) {
 		objType = objecttype.Commit
 	default:
 		return objecttype.Unknown, nil, fmt.Errorf(
-			"ReadObjectType: %w", &ErrBadObject{hash, "type"})
+			"ReadObjectType: %w", &BadObject{hash, "type"})
 	}
 	objCache[hash] = content
 	objTypeCache[hash] = objType

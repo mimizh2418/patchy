@@ -15,10 +15,10 @@ func validateObject(hash string) error {
 		return err
 	}
 	if _, err := hex.DecodeString(hash); err != nil || len(hash) != 40 {
-		return &ErrBadObjectID{hash}
+		return &BadObjectID{hash}
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", hash[:2], hash[2:])); err == nil && !exists {
-		return &ErrObjectNotFound{hash}
+		return &ObjectNotFound{hash}
 	} else if err != nil {
 		return err
 	}
@@ -64,10 +64,10 @@ func resolveAndValidateObject(shortHash *string) error {
 		decodeCheckString += "0"
 	}
 	if _, err := hex.DecodeString(decodeCheckString); err != nil || len(*shortHash) < 4 || len(*shortHash) > 40 {
-		return &ErrBadObjectID{*shortHash}
+		return &BadObjectID{*shortHash}
 	}
 	if exists, err := util.DoesFileExist(filepath.Join(repoDir, "objects", (*shortHash)[:2])); err == nil && !exists {
-		return &ErrObjectNotFound{*shortHash}
+		return &ObjectNotFound{*shortHash}
 	}
 	matches := make([]string, 0)
 	objectsDir := filepath.Join(repoDir, "objects", (*shortHash)[:2])
@@ -85,11 +85,11 @@ func resolveAndValidateObject(shortHash *string) error {
 	}
 
 	if len(matches) == 0 {
-		return &ErrObjectNotFound{*shortHash}
+		return &ObjectNotFound{*shortHash}
 	}
 	if len(matches) == 1 {
 		*shortHash = matches[0]
 		return nil
 	}
-	return &ErrAmbiguousObjectID{*shortHash, matches}
+	return &AmbiguousObjectID{*shortHash, matches}
 }

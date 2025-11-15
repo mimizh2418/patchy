@@ -38,7 +38,9 @@ func WriteCommit(tree string, parent *string, message string) (string, error) {
 	data = append(data, []byte(fmt.Sprintf("\000%s\000%s\000%d\000", author, message, currentTime.Unix()))...)
 	if parent != nil {
 		if objType, err := ReadObjectType(*parent); err == nil && objType != objecttype.Commit {
-			return "", fmt.Errorf("WriteCommit: bad parent, %w ", &ErrObjectTypeMismatch{*parent, objecttype.Commit, objType})
+			return "", fmt.Errorf(
+				"WriteCommit: bad parent, %w ",
+				&ObjectTypeMismatch{*parent, objecttype.Commit, objType})
 		} else if err != nil {
 			return "", fmt.Errorf("WriteCommit: bad parent, %w", err)
 		}
@@ -61,7 +63,7 @@ func ReadCommit(hash string) (*Commit, error) {
 		return nil, fmt.Errorf("ReadCommit: %w", err)
 	}
 	if objType != objecttype.Commit {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrObjectTypeMismatch{hash, objecttype.Commit, objType})
+		return nil, fmt.Errorf("ReadCommit: %w", &ObjectTypeMismatch{hash, objecttype.Commit, objType})
 	}
 	i := 0
 	treeHashEnd := -1
@@ -73,7 +75,7 @@ func ReadCommit(hash string) (*Commit, error) {
 		}
 	}
 	if treeHashEnd == -1 {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrBadObject{hash, "format"})
+		return nil, fmt.Errorf("ReadCommit: %w", &BadObject{hash, "format"})
 	}
 	treeHash := hex.EncodeToString(data[:treeHashEnd])
 	if err := validateObject(treeHash); err != nil {
@@ -90,7 +92,7 @@ func ReadCommit(hash string) (*Commit, error) {
 		}
 	}
 	if authorEnd == -1 {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrBadObject{hash, "format"})
+		return nil, fmt.Errorf("ReadCommit: %w", &BadObject{hash, "format"})
 	}
 	commit.Author = string(data[treeHashEnd+1 : authorEnd])
 	i++
@@ -103,7 +105,7 @@ func ReadCommit(hash string) (*Commit, error) {
 		}
 	}
 	if messageEnd == -1 {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrBadObject{hash, "format"})
+		return nil, fmt.Errorf("ReadCommit: %w", &BadObject{hash, "format"})
 	}
 	commit.Message = string(data[authorEnd+1 : messageEnd])
 	i++
@@ -116,11 +118,11 @@ func ReadCommit(hash string) (*Commit, error) {
 		}
 	}
 	if timeEnd == -1 {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrBadObject{hash, "format"})
+		return nil, fmt.Errorf("ReadCommit: %w", &BadObject{hash, "format"})
 	}
 	unixTime, err := strconv.Atoi(string(data[messageEnd+1 : timeEnd]))
 	if err != nil {
-		return nil, fmt.Errorf("ReadCommit: %w", &ErrBadObject{hash, "format"})
+		return nil, fmt.Errorf("ReadCommit: %w", &BadObject{hash, "format"})
 	}
 	commit.Time = time.Unix(int64(unixTime), 0)
 	i++
@@ -129,12 +131,12 @@ func ReadCommit(hash string) (*Commit, error) {
 	if i < len(data) {
 		parentHash := hex.EncodeToString(data[timeEnd+1:])
 		if len(parentHash) != 40 {
-			return nil, fmt.Errorf("ReadCommit: bad parent, %w", &ErrBadObjectID{hash})
+			return nil, fmt.Errorf("ReadCommit: bad parent, %w", &BadObjectID{hash})
 		}
 		if objType, err := ReadObjectType(parentHash); err == nil && objType != objecttype.Commit {
 			return nil, fmt.Errorf(
 				"ReadCommit: bad parent, %w ",
-				&ErrObjectTypeMismatch{parentHash, objecttype.Commit, objType})
+				&ObjectTypeMismatch{parentHash, objecttype.Commit, objType})
 		} else if err != nil {
 			return nil, fmt.Errorf("ReadCommit: %w", err)
 		}

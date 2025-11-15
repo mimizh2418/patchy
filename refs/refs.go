@@ -25,7 +25,7 @@ func UpdateRef(ref string, commitHash string) error {
 	if objType, err := objects.ReadObjectType(commitHash); err == nil && objType != objecttype.Commit {
 		return fmt.Errorf(
 			"UpdateRef: %w",
-			&objects.ErrObjectTypeMismatch{Hash: commitHash, Expected: objecttype.Commit, Actual: objType})
+			&objects.ObjectTypeMismatch{Hash: commitHash, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
 		return fmt.Errorf("UpdateRef: %w", err)
 	}
@@ -46,13 +46,13 @@ func ResolveRef(ref string) (string, error) {
 		if objType, err := objects.ReadObjectType(hash); err == nil && objType != objecttype.Commit {
 			return "", fmt.Errorf(
 				"ResolveRef: %w",
-				&objects.ErrObjectTypeMismatch{Hash: hash, Expected: objecttype.Commit, Actual: objType})
+				&objects.ObjectTypeMismatch{Hash: hash, Expected: objecttype.Commit, Actual: objType})
 		} else if err != nil {
 			return "", fmt.Errorf("ResolveRef: %w", err)
 		}
 		return hash, nil
 	} else if errors.Is(err, os.ErrNotExist) {
-		return "", fmt.Errorf("ResolveRef: %w", &ErrInvalidRef{Ref: ref})
+		return "", fmt.Errorf("ResolveRef: %w", &InvalidRef{Ref: ref})
 	} else {
 		return "", fmt.Errorf("ResolveRef: %w", err)
 	}
@@ -72,8 +72,7 @@ func ReadHead() (*HeadState, error) {
 	if strings.HasPrefix(content, "ref: ") {
 		ref := strings.TrimPrefix(content, "ref: ")
 		hash, err := ResolveRef(ref)
-		var invalidRefErr *ErrInvalidRef
-		if err != nil && !errors.As(err, &invalidRefErr) {
+		if err != nil && !errors.As(err, &ErrInvalidRef) {
 			return nil, fmt.Errorf("ReadHead: %w", err)
 		}
 		return &HeadState{false, ref, hash}, nil
@@ -82,7 +81,7 @@ func ReadHead() (*HeadState, error) {
 	if objType, err := objects.ReadObjectType(content); err == nil && objType != objecttype.Commit {
 		return nil, fmt.Errorf(
 			"ReadHead: %w",
-			&objects.ErrObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
+			&objects.ObjectTypeMismatch{Hash: content, Expected: objecttype.Commit, Actual: objType})
 	} else if err != nil {
 		return nil, fmt.Errorf("ReadHead: %w", err)
 	}

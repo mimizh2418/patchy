@@ -1,9 +1,11 @@
 package refs
 
-type ErrInvalidRef struct {
+type InvalidRef struct {
 	Ref string
 }
 
-func (e *ErrInvalidRef) Error() string {
+func (e *InvalidRef) Error() string {
 	return "could not resolve ref: " + e.Ref
 }
+
+var ErrInvalidRef *InvalidRef

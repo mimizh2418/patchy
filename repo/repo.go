@@ -31,7 +31,7 @@ func FindRepoDir() (string, error) {
 		}
 		dir = filepath.Dir(dir)
 	}
-	return "", &ErrNotInRepo{}
+	return "", ErrNotInRepo
 }
 
 func FindRepoRoot() (string, error) {
