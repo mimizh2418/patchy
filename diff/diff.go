@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"patchy/objects"
 	"patchy/util"
+	"sort"
 
 	"github.com/fatih/color"
 )
@@ -108,6 +109,9 @@ func TreeDiff(newTree string, oldTree string) ([]FileChange, error) {
 			})
 		}
 	}
+	sort.Slice(changes, func(i, j int) bool {
+		return changes[i].NewName < changes[j].NewName
+	})
 	return changes, nil
 }
 

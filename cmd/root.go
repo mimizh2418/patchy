@@ -9,6 +9,7 @@ import (
 	"patchy/cmd/backend/writetree"
 	"patchy/cmd/frontend/commit"
 	"patchy/cmd/frontend/initialize"
+	"patchy/cmd/frontend/status"
 	"patchy/util"
 
 	"github.com/fatih/color"
@@ -42,4 +43,5 @@ func init() {
 
 	RootCmd.AddCommand(commit.NewCommand())
 	RootCmd.AddCommand(initialize.NewCommand())
+	RootCmd.AddCommand(status.NewCommand())
 }

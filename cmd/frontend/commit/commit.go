@@ -6,7 +6,6 @@ import (
 	"patchy/refs"
 	"patchy/repo"
 	"patchy/util"
-	"path/filepath"
 	"strings"
 
 	"github.com/fatih/color"
@@ -64,7 +63,7 @@ HEAD, and the HEAD reference will be updated to point to the new commit, unless 
 					color.FgYellow,
 					"Warning: You are in 'detached HEAD' state. The new commit will not be referenced by any branch.")
 			} else {
-				branchName = filepath.Base(headStatus.Ref)
+				branchName = headStatus.Ref[len("refs/heads/"):]
 			}
 			util.ColorPrintf(color.FgCyan, "[%s %s] ", branchName, hash[:7])
 			util.Println(strings.SplitN(commitMessage, "\n", 2)[0])
