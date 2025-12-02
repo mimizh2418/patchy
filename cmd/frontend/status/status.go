@@ -55,8 +55,8 @@ func NewCommand() *cobra.Command {
 					util.ColorPrintf(color.FgRed, "    deleted: %s\n", change.OldName)
 				case diff.Modified:
 					util.ColorPrintf(color.FgYellow, "    modified: %s\n", change.NewName)
-				case diff.Renamed:
-					util.ColorPrintf(color.FgCyan, "    renamed: %s -> %s\n", change.OldName, change.NewName)
+				case diff.Moved:
+					util.ColorPrintf(color.FgCyan, "    moved: %s -> %s\n", change.OldName, change.NewName)
 				}
 			}
 			return nil

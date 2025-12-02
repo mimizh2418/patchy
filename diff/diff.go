@@ -15,7 +15,7 @@ const (
 	Added ChangeType = iota
 	Deleted
 	Modified
-	Renamed
+	Moved
 )
 
 type FileChange struct {
@@ -97,7 +97,7 @@ func TreeDiff(newTree string, oldTree string) ([]FileChange, error) {
 			})
 		}
 	}
-	// Check for renamed files
+	// Check for renamed/moved files
 	for hash, oldName := range oldTreeByHash {
 		if newName, exists := newTreeByHash[hash]; exists && oldName != newName {
 			changes = append(changes, FileChange{
@@ -105,7 +105,7 @@ func TreeDiff(newTree string, oldTree string) ([]FileChange, error) {
 				NewName:    newName,
 				OldHash:    hash,
 				NewHash:    hash,
-				ChangeType: Renamed,
+				ChangeType: Moved,
 			})
 		}
 	}
@@ -119,7 +119,7 @@ func PrintDiffSummary(changes []FileChange) {
 	additions := 0
 	modifications := 0
 	deletions := 0
-	renames := 0
+	moves := 0
 	for _, change := range changes {
 		switch change.ChangeType {
 		case Added:
@@ -128,8 +128,8 @@ func PrintDiffSummary(changes []FileChange) {
 			deletions++
 		case Modified:
 			modifications++
-		case Renamed:
-			renames++
+		case Moved:
+			moves++
 		}
 	}
 	if additions > 0 {
@@ -141,7 +141,7 @@ func PrintDiffSummary(changes []FileChange) {
 	if deletions > 0 {
 		util.ColorPrintf(color.FgRed, "    %d file(s) removed\n", deletions)
 	}
-	if renames > 0 {
-		util.ColorPrintf(color.FgCyan, "    %d file(s) renamed\n", renames)
+	if moves > 0 {
+		util.ColorPrintf(color.FgCyan, "    %d file(s) renamed/moved\n", moves)
 	}
 }
