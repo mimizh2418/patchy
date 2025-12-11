@@ -22,22 +22,14 @@ type TreeEntry struct {
 }
 
 func WriteTree(path string) (string, error) {
-	repoDir, err := repo.FindRepoDir()
+	repoRoot, err := repo.FindRepoRoot()
 	if err != nil {
 		return "", fmt.Errorf("WriteTree: %w", err)
 	}
-	repoRoot := filepath.Dir(repoDir)
 
 	// Validate path
-	if exists, err := util.DoesFileExist(path); err == nil && !exists {
-		return "", fmt.Errorf("WriteTree: file %s does not exist", path)
-	} else if !exists {
+	if err = repo.ValidateFileInRepo(path); err != nil {
 		return "", fmt.Errorf("WriteTree: %w", err)
-	}
-	if inRepo, err := repo.IsFileInRepo(path); err != nil {
-		return "", fmt.Errorf("WriteTree: %w", err)
-	} else if !inRepo {
-		return "", fmt.Errorf("WriteTree: %w", &repo.FileNotInRepo{Path: path})
 	}
 	if isDir, err := util.IsDirectory(path); err != nil {
 		return "", fmt.Errorf("WriteTree: %w", err)
@@ -204,4 +196,33 @@ func PrintTree(hash string) error {
 		util.Fprintf(writer, "%s\t%s  \t%s\n", entry.Mode, entry.Hash, entry.Name)
 	}
 	return writer.Flush()
+}
+
+func UnpackTree(hash string, path string) error {
+	// Validate path
+	if err := repo.ValidateFileInRepo(path); err != nil {
+		return fmt.Errorf("UnpackTree: %w", err)
+	}
+	if isDir, err := util.IsDirectory(path); err != nil {
+		return fmt.Errorf("UnpackTree: %w", err)
+	} else if !isDir {
+		return fmt.Errorf("UnpackTree: file %s is not a directory", path)
+	}
+
+	tree, err := ReadTreeRecursive(hash)
+	if err != nil {
+		return fmt.Errorf("UnpackTree: %w", err)
+	}
+	entries := FlattenTreeEntries(tree)
+	for _, entry := range entries {
+		file := filepath.Join(path, entry.Name)
+		blob, err := ReadBlob(entry.Hash)
+		if err != nil {
+			return fmt.Errorf("UnpackTree: %w", err)
+		}
+		if err = os.WriteFile(file, blob, 0644); err != nil {
+			return fmt.Errorf("UnpackTree: %w", err)
+		}
+	}
+	return nil
 }

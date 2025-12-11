@@ -3,6 +3,8 @@ package diff
 import (
 	"fmt"
 	"patchy/objects"
+	"patchy/refs"
+	"patchy/repo"
 	"patchy/util"
 	"sort"
 
@@ -112,6 +114,30 @@ func TreeDiff(newTree string, oldTree string) ([]FileChange, error) {
 	sort.Slice(changes, func(i, j int) bool {
 		return changes[i].NewName < changes[j].NewName
 	})
+	return changes, nil
+}
+
+func WorkingTreeDiff() ([]FileChange, error) {
+	repoRoot, err := repo.FindRepoRoot()
+	if err != nil {
+		return nil, fmt.Errorf("WorkingTreeDiff: %w", err)
+	}
+	headState, err := refs.ReadHead()
+	if err != nil {
+		return nil, fmt.Errorf("WorkingTreeDiff: %w", err)
+	}
+	headCommit, err := objects.ReadCommit(headState.Commit)
+	if err != nil {
+		return nil, fmt.Errorf("WorkingTreeDiff: %w", err)
+	}
+	currentTree, err := objects.WriteTree(repoRoot)
+	if err != nil {
+		return nil, fmt.Errorf("WorkingTreeDiff: %w", err)
+	}
+	changes, err := TreeDiff(currentTree, headCommit.Tree)
+	if err != nil {
+		return nil, fmt.Errorf("WorkingTreeDiff: %w", err)
+	}
 	return changes, nil
 }
 

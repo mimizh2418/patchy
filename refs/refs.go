@@ -21,7 +21,7 @@ type HeadState struct {
 func ResolveRef(ref string) (string, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return "", fmt.Errorf("UpdateRef: %w", err)
+		return "", fmt.Errorf("ResolveRef: %w", err)
 	}
 	if data, err := os.ReadFile(filepath.Join(repoDir, ref)); err == nil {
 		hash := string(data)
@@ -111,7 +111,7 @@ func UpdateRef(ref string, commitHash string) error {
 		return fmt.Errorf("UpdateRef: %w", err)
 	}
 
-	if err := os.WriteFile(filepath.Join(repoDir, ref), []byte(commitHash), 0666); err != nil {
+	if err := os.WriteFile(filepath.Join(repoDir, ref), []byte(commitHash), 0644); err != nil {
 		return fmt.Errorf("UpdateRef: %w", err)
 	}
 	return nil
@@ -120,7 +120,7 @@ func UpdateRef(ref string, commitHash string) error {
 func ReadHead() (*HeadState, error) {
 	repoDir, err := repo.FindRepoDir()
 	if err != nil {
-		return nil, fmt.Errorf("UpdateRef: %w", err)
+		return nil, fmt.Errorf("ReadHead: %w", err)
 	}
 	data, err := os.ReadFile(filepath.Join(repoDir, "HEAD"))
 	if err != nil {
@@ -145,4 +145,27 @@ func ReadHead() (*HeadState, error) {
 		return nil, fmt.Errorf("ReadHead: %w", err)
 	}
 	return &HeadState{true, "", content}, nil
+}
+
+func UpdateHead(revSpec string) error {
+	repoDir, err := repo.FindRepoDir()
+	if err != nil {
+		return fmt.Errorf("UpdateHead: %w", err)
+	}
+	if _, err := ResolveRef("refs/heads/" + revSpec); err == nil {
+		// branch
+		if err := os.WriteFile(filepath.Join(repoDir, "HEAD"), []byte("ref: refs/heads/"+revSpec), 0666); err != nil {
+			return fmt.Errorf("UpdateHead: %w", err)
+		}
+		return nil
+	}
+	// commit hash
+	hash, err := ParseRev(revSpec)
+	if err != nil {
+		return fmt.Errorf("UpdateHead: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(repoDir, "HEAD"), []byte(hash), 0666); err != nil {
+		return fmt.Errorf("UpdateHead: %w", err)
+	}
+	return nil
 }

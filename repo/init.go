@@ -29,7 +29,7 @@ func InitRepo(path string) (string, error) {
 		return "", fmt.Errorf("InitRepo: %w", err)
 	}
 
-	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main"), 0666); err != nil {
+	if err = os.WriteFile(filepath.Join(repoPath, "HEAD"), []byte("ref: refs/heads/main"), 0644); err != nil {
 		_ = os.RemoveAll(repoPath)
 		return "", fmt.Errorf("InitRepo: %w", err)
 	}

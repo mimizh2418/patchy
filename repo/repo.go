@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"fmt"
 	"os"
 	"patchy/util"
 	"path/filepath"
@@ -55,4 +56,18 @@ func IsFileInRepo(path string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func ValidateFileInRepo(path string) error {
+	if exists, err := util.DoesFileExist(path); err == nil && !exists {
+		return fmt.Errorf("file %s does not exist", path)
+	} else if !exists {
+		return err
+	}
+	if inRepo, err := IsFileInRepo(path); err != nil {
+		return err
+	} else if !inRepo {
+		return &FileNotInRepo{Path: path}
+	}
+	return nil
 }

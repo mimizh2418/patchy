@@ -8,6 +8,8 @@ import (
 	"patchy/cmd/backend/updateref"
 	"patchy/cmd/backend/writeblob"
 	"patchy/cmd/backend/writetree"
+	"patchy/cmd/frontend/branch"
+	"patchy/cmd/frontend/checkout"
 	"patchy/cmd/frontend/commit"
 	"patchy/cmd/frontend/initialize"
 	"patchy/cmd/frontend/log"
@@ -44,6 +46,8 @@ func init() {
 	RootCmd.AddCommand(updateref.NewCommand())
 	RootCmd.AddCommand(writetree.NewCommand())
 
+	RootCmd.AddCommand(branch.NewCommand())
+	RootCmd.AddCommand(checkout.NewCommand())
 	RootCmd.AddCommand(commit.NewCommand())
 	RootCmd.AddCommand(initialize.NewCommand())
 	RootCmd.AddCommand(log.NewCommand())

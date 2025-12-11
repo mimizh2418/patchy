@@ -2,9 +2,7 @@ package status
 
 import (
 	"patchy/diff"
-	"patchy/objects"
 	"patchy/refs"
-	"patchy/repo"
 	"patchy/util"
 
 	"github.com/fatih/color"
@@ -18,32 +16,21 @@ func NewCommand() *cobra.Command {
 		Long:  `Displays all changes made to the working tree since the last commit.`,
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			repoRoot, err := repo.FindRepoRoot()
-			if err != nil {
-				return err
-			}
 			headState, err := refs.ReadHead()
 			if err != nil {
 				return err
 			}
-			headCommit, err := objects.ReadCommit(headState.Commit)
-			if err != nil {
-				return err
-			}
-			currentTree, err := objects.WriteTree(repoRoot)
-
 			if headState.Detached {
 				util.ColorPrintf(color.FgRed, "HEAD detached at %s\n\n", headState.Commit[:7])
 			} else {
 				util.Printf("On branch %s\n\n", headState.Ref[len("refs/heads/"):])
 			}
-			if currentTree == headCommit.Tree {
+			changes, err := diff.WorkingTreeDiff()
+			if len(changes) == 0 {
 				util.Println("Nothing to commit, working tree clean")
 				return nil
 			}
-
 			util.Println("Changes to be committed:")
-			changes, err := diff.TreeDiff(currentTree, headCommit.Tree)
 			if err != nil {
 				return err
 			}
